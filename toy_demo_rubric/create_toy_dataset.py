@@ -6,8 +6,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import os
 
-# 创建简单的数学问题数据集
-prompts = [
+# 创建简单的数学问题数据集（使用 messages 格式）
+questions = [
     'What is 2 + 2?',
     'What is 5 * 3?',
     'What is 10 - 4?',
@@ -16,6 +16,11 @@ prompts = [
     'What is 6 * 2?',
     'What is 9 - 3?',
     'What is 12 / 3?',
+]
+
+# 将每个问题转换为 messages 格式
+prompts = [
+    [{"role": "user", "content": q}] for q in questions
 ] * 4  # 重复4次，得到32个样本
 
 ground_truths = [
