@@ -26,14 +26,8 @@ TOTAL_STEPS=3  # 只运行3步用于测试
 # 设置PYTHONPATH以导入patch
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
-# 运行训练（导入patch）
-python3 -c "
-import sys
-sys.path.insert(0, 'toy_demo_rubric')
-import patch_ray_trainer  # 这会自动patch trainer
-" && \
-
-python3 -m verl.trainer.main_ppo \
+# 运行训练（使用wrapper脚本在同一进程中应用patch）
+python3 toy_demo_rubric/train_with_patch.py \
     algorithm.adv_estimator=grpo \
     data.train_files="${TRAIN_FILES}" \
     data.val_files="${VAL_FILES}" \

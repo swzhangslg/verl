@@ -15,6 +15,8 @@ def add_reward_dimension_metrics(batch, metrics):
     # 定义我们关心的reward维度
     reward_dimensions = ['correctness', 'completeness', 'practicality', 'response_length']
 
+    print(f"[DEBUG] add_reward_dimension_metrics called. Available keys in non_tensor_batch: {list(batch.non_tensor_batch.keys())}", flush=True)
+
     for dim_name in reward_dimensions:
         if dim_name in batch.non_tensor_batch:
             values = batch.non_tensor_batch[dim_name]
@@ -26,6 +28,7 @@ def add_reward_dimension_metrics(batch, metrics):
                 metrics[f'train/reward/{dim_name}/max'] = float(np.max(values))
                 metrics[f'train/reward/{dim_name}/min'] = float(np.min(values))
                 metrics[f'train/reward/{dim_name}/std'] = float(np.std(values))
+                print(f"[DEBUG] Added metrics for {dim_name}: mean={metrics[f'train/reward/{dim_name}/mean']:.3f}", flush=True)
 
     return metrics
 
@@ -61,10 +64,10 @@ def patch_trainer():
 
         try:
             # 调用原始fit
-            print("\n" + "="*60)
-            print("🎯 Rubric Reward Tracking ENABLED")
-            print("   将打印以下维度: correctness, completeness, practicality")
-            print("="*60 + "\n")
+            print("\n" + "="*60, flush=True)
+            print("🎯 Rubric Reward Tracking ENABLED", flush=True)
+            print("   将打印以下维度: correctness, completeness, practicality", flush=True)
+            print("="*60 + "\n", flush=True)
 
             return original_fit(self)
         finally:
@@ -73,8 +76,10 @@ def patch_trainer():
 
     # 替换fit方法
     RayPPOTrainer.fit = patched_fit
-    print("✅ RayPPOTrainer has been patched to track rubric dimensions")
+    print("✅ RayPPOTrainer has been patched to track rubric dimensions", flush=True)
 
 
 # 自动执行patch
+print("🔧 Starting to patch RayPPOTrainer...", flush=True)
 patch_trainer()
+print("✅ Patch applied successfully!", flush=True)
