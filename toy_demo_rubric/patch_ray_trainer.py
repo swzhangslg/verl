@@ -32,12 +32,12 @@ def add_reward_dimension_metrics(batch, metrics):
 
 def patch_trainer():
     """
-    动态patch PPOTrainer以添加reward维度打印
+    动态patch RayPPOTrainer以添加reward维度打印
     """
-    from verl.trainer.ppo.ray_trainer import PPOTrainer
+    from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 
     # 保存原始的fit方法
-    original_fit = PPOTrainer.fit
+    original_fit = RayPPOTrainer.fit
 
     def patched_fit(self):
         """Patched fit method with reward dimension tracking"""
@@ -72,8 +72,8 @@ def patch_trainer():
             metric_utils.compute_data_metrics = original_compute_data_metrics
 
     # 替换fit方法
-    PPOTrainer.fit = patched_fit
-    print("✅ PPOTrainer has been patched to track rubric dimensions")
+    RayPPOTrainer.fit = patched_fit
+    print("✅ RayPPOTrainer has been patched to track rubric dimensions")
 
 
 # 自动执行patch
