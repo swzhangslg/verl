@@ -1314,6 +1314,18 @@ class RayPPOTrainer:
                 )
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
+
+                # Extract reward dimensions from batch.non_tensor_batch (for multi-dimensional rewards)
+                reward_dimensions = ['correctness', 'completeness', 'practicality', 'response_length']
+                for dim_name in reward_dimensions:
+                    if dim_name in batch.non_tensor_batch:
+                        values = batch.non_tensor_batch[dim_name]
+                        if len(values) > 0 and isinstance(values[0], (int, float, bool, np.number)):
+                            metrics[f'train/reward/{dim_name}/mean'] = float(np.mean(values))
+                            metrics[f'train/reward/{dim_name}/max'] = float(np.max(values))
+                            metrics[f'train/reward/{dim_name}/min'] = float(np.min(values))
+                            metrics[f'train/reward/{dim_name}/std'] = float(np.std(values))
+
                 metrics.update(compute_timing_metrics(batch=batch, timing_raw=timing_raw))
                 # TODO: implement actual tflpo and theoretical tflpo
                 n_gpus = self.resource_pool_manager.get_n_gpus()
